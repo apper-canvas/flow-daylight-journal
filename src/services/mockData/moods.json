@@ -1,0 +1,27 @@
+[
+  {
+    "value": "joyful",
+    "emoji": "😊",
+    "color": "#82C09A"
+  },
+  {
+    "value": "peaceful",
+    "emoji": "😌",
+    "color": "#88B0D3"
+  },
+  {
+    "value": "thoughtful",
+    "emoji": "🤔",
+    "color": "#6B5B95"
+  },
+  {
+    "value": "content",
+    "emoji": "😌",
+    "color": "#B8A9C9"
+  },
+  {
+    "value": "overwhelmed",
+    "emoji": "😰",
+    "color": "#FFB563"
+  }
+]

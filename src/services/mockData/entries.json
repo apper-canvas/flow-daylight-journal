@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "date": "2024-01-15",
+    "content": "What a beautiful morning! I woke up early and watched the sunrise from my window. The way the light slowly painted the sky in shades of pink and orange reminded me of watercolor paintings. I made my favorite coffee and spent some time reading before starting my day. There's something magical about those quiet moments before the world wakes up.\n\nI've been thinking about how grateful I am for these small, peaceful moments. They ground me and remind me that happiness often comes from the simplest things.",
+    "mood": "joyful",
+    "createdAt": "2024-01-15T07:30:00Z",
+    "updatedAt": "2024-01-15T07:30:00Z"
+  },
+  {
+    "Id": 2,
+    "date": "2024-01-14",
+    "content": "Had a challenging day at work today. The project I've been working on hit a major roadblock, and I felt frustrated for most of the afternoon. But I talked to my colleague Sarah, and she helped me see the problem from a different angle.\n\nSometimes I forget that asking for help is not a sign of weakness. It's actually quite brave to admit when you're stuck. I'm learning to be more patient with myself and the process.",
+    "mood": "thoughtful",
+    "createdAt": "2024-01-14T19:45:00Z",
+    "updatedAt": "2024-01-14T19:45:00Z"
+  },
+  {
+    "Id": 3,
+    "date": "2024-01-13",
+    "content": "Spent the afternoon in the garden today. There's something therapeutic about working with soil and plants. I planted some new herbs - basil, rosemary, and thyme. The smell of fresh earth and growing things always lifts my spirits.\n\nMom called while I was outside, and we talked for an hour about everything and nothing. I love how conversations with her can flow so naturally. She reminded me to take care of myself and not get too caught up in the busy-ness of life.",
+    "mood": "peaceful",
+    "createdAt": "2024-01-13T16:20:00Z",
+    "updatedAt": "2024-01-13T16:20:00Z"
+  },
+  {
+    "Id": 4,
+    "date": "2024-01-12",
+    "content": "Today was one of those days where everything felt overwhelming. Too many tasks, too many decisions, and not enough time. I felt scattered and anxious for most of the morning.\n\nI decided to take a walk during lunch break. The fresh air and movement helped clear my head. I reminded myself that it's okay to feel overwhelmed sometimes - it doesn't mean I'm failing. It just means I'm human.",
+    "mood": "overwhelmed",
+    "createdAt": "2024-01-12T21:15:00Z",
+    "updatedAt": "2024-01-12T21:15:00Z"
+  },
+  {
+    "Id": 5,
+    "date": "2024-01-11",
+    "content": "Discovered a new café today while exploring the neighborhood. The barista was incredibly friendly, and they had the most amazing lavender latte. I brought my book and spent two hours just reading and people-watching.\n\nThere's something special about finding a new place that feels like home immediately. I watched people come and go, each with their own story, their own purpose. It reminded me of how connected we all are, even when we're strangers.",
+    "mood": "content",
+    "createdAt": "2024-01-11T14:30:00Z",
+    "updatedAt": "2024-01-11T14:30:00Z"
+  }
+]

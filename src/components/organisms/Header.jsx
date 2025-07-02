@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { formatDate } from '@/utils/dateUtils';
 import ApperIcon from '@/components/ApperIcon';
 import SearchBar from '@/components/molecules/SearchBar';
+import { AuthContext } from '@/components/AppContent';
 
+const LogoutButton = () => {
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  return (
+    <motion.button
+      onClick={handleLogout}
+      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      title="Logout"
+    >
+      <ApperIcon name="LogOut" size={20} className="text-gray-600" />
+    </motion.button>
+  );
+};
 const Header = ({ onSearch, showSearch = true, className = "" }) => {
   const today = new Date();
 
@@ -44,7 +68,7 @@ const Header = ({ onSearch, showSearch = true, className = "" }) => {
             </div>
           )}
           
-          <div className="flex items-center space-x-2">
+<div className="flex items-center space-x-2">
             <motion.button
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               whileHover={{ scale: 1.05 }}
@@ -53,13 +77,7 @@ const Header = ({ onSearch, showSearch = true, className = "" }) => {
               <ApperIcon name="Settings" size={20} className="text-gray-600" />
             </motion.button>
             
-            <motion.button
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ApperIcon name="Download" size={20} className="text-gray-600" />
-            </motion.button>
+            <LogoutButton />
           </div>
         </div>
       </div>

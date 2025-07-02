@@ -1,96 +1,369 @@
-import entriesData from '@/services/mockData/entries.json';
+import { toast } from 'react-toastify';
 
-let entries = [...entriesData];
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const getApperClient = () => {
+  const { ApperClient } = window.ApperSDK;
+  return new ApperClient({
+    apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+    apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+  });
+};
 
 export const entryService = {
   async getAll() {
-    await delay(300);
-    return [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "date" } },
+          { field: { Name: "content" } },
+          { field: { Name: "mood" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } }
+        ],
+        orderBy: [
+          {
+            fieldName: "date",
+            sorttype: "DESC"
+          }
+        ]
+      };
+      
+      const response = await apperClient.fetchRecords('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+      
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching entries:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    const entry = entries.find(entry => entry.Id === parseInt(id));
-    return entry ? { ...entry } : null;
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "date" } },
+          { field: { Name: "content" } },
+          { field: { Name: "mood" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } }
+        ]
+      };
+      
+      const response = await apperClient.getRecordById('entry', parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+      
+      return response.data || null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching entry with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async getByDate(date) {
-    await delay(200);
-    const entry = entries.find(entry => entry.date === date);
-    return entry ? { ...entry } : null;
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "date" } },
+          { field: { Name: "content" } },
+          { field: { Name: "mood" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } }
+        ],
+        where: [
+          {
+            FieldName: "date",
+            Operator: "EqualTo",
+            Values: [date]
+          }
+        ]
+      };
+      
+      const response = await apperClient.fetchRecords('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+      
+      return (response.data && response.data.length > 0) ? response.data[0] : null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching entry for date ${date}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async create(entryData) {
-    await delay(400);
-    const newEntry = {
-      ...entryData,
-      Id: Math.max(...entries.map(e => e.Id), 0) + 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    entries.push(newEntry);
-    return { ...newEntry };
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        records: [
+          {
+            Name: entryData.Name || `Entry for ${entryData.date}`,
+            Tags: entryData.Tags || "",
+            date: entryData.date,
+            content: entryData.content,
+            mood: entryData.mood || "",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]
+      };
+      
+      const response = await apperClient.createRecord('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+      
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+      
+      return null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating entry:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async update(id, entryData) {
-    await delay(300);
-    const index = entries.findIndex(entry => entry.Id === parseInt(id));
-    if (index === -1) return null;
-    
-    entries[index] = {
-      ...entries[index],
-      ...entryData,
-      updatedAt: new Date().toISOString()
-    };
-    return { ...entries[index] };
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        records: [
+          {
+            Id: parseInt(id),
+            Name: entryData.Name || `Entry for ${entryData.date}`,
+            Tags: entryData.Tags || "",
+            date: entryData.date,
+            content: entryData.content,
+            mood: entryData.mood || "",
+            updated_at: new Date().toISOString()
+          }
+        ]
+      };
+      
+      const response = await apperClient.updateRecord('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+      
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null;
+      }
+      
+      return null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating entry:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async updateByDate(date, entryData) {
-    await delay(300);
-    const index = entries.findIndex(entry => entry.date === date);
-    if (index === -1) {
-      // Create new entry if doesn't exist
-      return this.create({ ...entryData, date });
+    try {
+      const existingEntry = await this.getByDate(date);
+      
+      if (existingEntry) {
+        return this.update(existingEntry.Id, { ...entryData, date });
+      } else {
+        return this.create({ ...entryData, date });
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating entry by date:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
     }
-    
-    entries[index] = {
-      ...entries[index],
-      ...entryData,
-      updatedAt: new Date().toISOString()
-    };
-    return { ...entries[index] };
   },
 
   async delete(id) {
-    await delay(200);
-    const index = entries.findIndex(entry => entry.Id === parseInt(id));
-    if (index === -1) return false;
-    
-    entries.splice(index, 1);
-    return true;
+    try {
+      const apperClient = getApperClient();
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+      
+      const response = await apperClient.deleteRecord('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+      
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+      
+      return false;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting entry:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return false;
+    }
   },
 
   async search(query, startDate = null, endDate = null) {
-    await delay(300);
-    let filteredEntries = [...entries];
-
-    if (startDate && endDate) {
-      filteredEntries = filteredEntries.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return entryDate >= new Date(startDate) && entryDate <= new Date(endDate);
-      });
+    try {
+      const apperClient = getApperClient();
+      const whereConditions = [];
+      
+      if (startDate && endDate) {
+        whereConditions.push({
+          FieldName: "date",
+          Operator: "GreaterThanOrEqualTo",
+          Values: [startDate]
+        });
+        whereConditions.push({
+          FieldName: "date",
+          Operator: "LessThanOrEqualTo",
+          Values: [endDate]
+        });
+      }
+      
+      if (query && query.trim()) {
+        const searchTerm = query.toLowerCase();
+        whereConditions.push({
+          FieldName: "content",
+          Operator: "Contains",
+          Values: [searchTerm]
+        });
+      }
+      
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "date" } },
+          { field: { Name: "content" } },
+          { field: { Name: "mood" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } }
+        ],
+        where: whereConditions,
+        orderBy: [
+          {
+            fieldName: "date",
+            sorttype: "DESC"
+          }
+        ]
+      };
+      
+      const response = await apperClient.fetchRecords('entry', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+      
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error searching entries:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
     }
-
-    if (query && query.trim()) {
-      const searchTerm = query.toLowerCase();
-      filteredEntries = filteredEntries.filter(entry =>
-        entry.content.toLowerCase().includes(searchTerm) ||
-        entry.mood.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    return filteredEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 };
